@@ -4,8 +4,8 @@
 package main
 
 import (
-	"ManticoreDB/Storage"
 	"ManticoreDB/misc"
+	"ManticoreDB/storage"
 	"fmt"
 	"log"
 )

@@ -1,8 +1,9 @@
+go_import_path: ManticoreDB
 language: go
-go: release
-os:
- - windows
+go: 1.13.6
+#install: true
 script:
+  - make
   - go test -race -coverprofile=coverage.txt -covermode=atomic
 after_success:
   - bash <(curl -s https://codecov.io/bash)

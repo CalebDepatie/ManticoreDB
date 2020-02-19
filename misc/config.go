@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	yaml "src/gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 var Conf Config

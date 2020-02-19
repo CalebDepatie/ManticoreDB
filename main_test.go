@@ -1,8 +1,8 @@
 package main
 
 import (
-	storage "ManticoreDB/Storage"
 	"ManticoreDB/misc"
+	"ManticoreDB/storage"
 	"testing"
 )
 
