@@ -28,11 +28,11 @@ func GetConfig(path string) (Config, error) {
 	return conf, nil
 }
 
-func (conf Config)UpdateConfigDBs(s []string) {
+func (conf Config) UpdateConfigDBs(s []string) {
 	conf.Databases = s
 }
 
-func (conf Config)SaveConfig(path string) error {
+func (conf Config) SaveConfig(path string) error {
 	data, err := yaml.Marshal(conf)
 	if err != nil {
 		return err
