@@ -18,7 +18,7 @@ type Table struct {
 
 //Print the table in a table format
 //TODO: Add consistent entry spacing
-func (t Table)String() string {
+func (t Table) String() string {
 	var temp strings.Builder
 	ncols := len(t.Headers)
 	nrows := len(t.Entries)
