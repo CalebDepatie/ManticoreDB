@@ -15,7 +15,7 @@ func Test(t *testing.T) {
 	}
 
 	vers := misc.GetVersion()
-	if vers != "0.1" {
+	if vers != "0.2" {
 		t.Error("Incorrect version returned")
 	}
 

@@ -62,7 +62,7 @@ func (t Table) String() string {
 				temp.WriteString(" ")
 			}
 			//for oddnumbers add an extra trailing space
-			if (numspaces[t.Headers[i]]-len(t.Entries[j][i])) % 2 != 0 {
+			if (numspaces[t.Headers[i]]-len(t.Entries[j][i]))%2 != 0 {
 				temp.WriteString(" ")
 			}
 			temp.WriteString("|")
