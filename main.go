@@ -1,5 +1,3 @@
-//Test DBMS setup before go_test files are created
-
 //Initial inspiration taken from Ivy (https://github.com/jameycribbs/ivy)
 package main
 
@@ -34,24 +32,8 @@ func init() {
 }
 
 func main() {
-	//initial table
+
 	temp, err := sc.Databases[0].ReadTable("people")
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(temp)
-
-	//delete row 2
-	sc.Databases[0].DelRow("people", 1)
-	temp, err = sc.Databases[0].ReadTable("people")
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(temp)
-
-	//Add row 2 back
-	sc.Databases[0].AddRow("people", []string{"Jack", "Daniels", "Tennessee"}, 1)
-	temp, err = sc.Databases[0].ReadTable("people")
 	if err != nil {
 		fmt.Println(err)
 	}

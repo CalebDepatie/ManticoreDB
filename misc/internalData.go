@@ -2,7 +2,7 @@ package misc
 
 //Internal Data
 const (
-	version = "0.1"
+	version = "0.2"
 )
 
 //Get the current version

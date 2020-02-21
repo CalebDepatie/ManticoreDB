@@ -17,20 +17,55 @@ type Table struct {
 }
 
 //Print the table in a table format
-//TODO: Add consistent entry spacing
 func (t Table) String() string {
 	var temp strings.Builder
 	ncols := len(t.Headers)
 	nrows := len(t.Entries)
+	//Entry Spacing code
+	//find highest numspaces for each col
+	numspaces := make(map[string]int) //This method may not be the most resource conscious
+	//get baseline col numspaces
+	for i := 0; i < ncols; i++ {
+		numspaces[t.Headers[i]] = len(t.Headers[i])
+	}
+	//get highest numspaces per col
+	for i := 0; i < ncols; i++ {
+		for j := 0; j < nrows; j++ {
+			if len(t.Entries[j][i]) > numspaces[t.Headers[i]] {
+				numspaces[t.Headers[i]] = len(t.Entries[j][i])
+			}
+		}
+	}
+
 	//Display headers
 	for i := 0; i < ncols; i++ {
-		temp.WriteString(fmt.Sprintf("| %s |", t.Headers[i]))
+		temp.WriteString("|")
+		for n := 0; n <= (numspaces[t.Headers[i]]-len(t.Headers[i]))/2; n++ {
+			temp.WriteString(" ")
+		}
+		temp.WriteString(fmt.Sprintf("%s", t.Headers[i]))
+		for n := 0; n <= (numspaces[t.Headers[i]]-len(t.Headers[i]))/2; n++ {
+			temp.WriteString(" ")
+		}
+		temp.WriteString("|")
 	}
 	temp.WriteString("\n")
 	//Display entries
 	for j := 0; j < nrows; j++ {
 		for i := 0; i < ncols; i++ {
-			temp.WriteString(fmt.Sprintf("| %s |", t.Entries[j][i]))
+			temp.WriteString("|")
+			for n := 0; n <= (numspaces[t.Headers[i]]-len(t.Entries[j][i]))/2; n++ {
+				temp.WriteString(" ")
+			}
+			temp.WriteString(fmt.Sprintf("%s", t.Entries[j][i]))
+			for n := 0; n <= (numspaces[t.Headers[i]]-len(t.Entries[j][i]))/2; n++ {
+				temp.WriteString(" ")
+			}
+			//for oddnumbers add an extra trailing space
+			if (numspaces[t.Headers[i]]-len(t.Entries[j][i])) % 2 != 0 {
+				temp.WriteString(" ")
+			}
+			temp.WriteString("|")
 		}
 		temp.WriteString("\n")
 	}
