@@ -1,7 +1,8 @@
-package storage
+package main
 
 import (
 	"encoding/csv"
+	"encoding/gob"
 	"errors"
 	"fmt"
 	"io"
@@ -74,8 +75,52 @@ func (t Table) String() string {
 
 //Struct representing how the data is held
 type DB struct {
-	Name   string   //the name of the table is also the directory where entries will be stored
-	Tables []string //file names of the tables
+	Name   string        //the name of the table is also the directory where entries will be stored
+	Tables []string      //file names of the tables
+	TLog   []transaction //Transaction log of the DB
+}
+
+//Transaction based methods
+func (database *DB) AddTransaction(Type string, TableName string, Data ...interface{}) {
+	database.TLog = append(database.TLog, CreateTransaction(len(database.TLog), Type, TableName, Data...))
+}
+
+func (database *DB) SaveLog() error {
+	path := fmt.Sprintf("%s/tlog.gob", database.Name)
+	file, err := os.Create(path)
+	defer file.Close()
+	if err != nil {
+		return err
+	}
+	enc := gob.NewEncoder(file)
+	err = enc.Encode(database.TLog)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (database *DB) LoadLog() error {
+	path := fmt.Sprintf("%s/tlog.gob", database.Name)
+	file, err := os.Open(path)
+	defer file.Close()
+	if err != nil {
+		return err
+	}
+	stat, err := file.Stat()
+	if err != nil {
+		return err
+	}
+	if stat.Size() != 0 {
+		dec := gob.NewDecoder(file)
+		err = dec.Decode(&database.TLog)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 //Delete the nth row
@@ -84,6 +129,7 @@ func (database *DB) DelRow(name string, n int) error {
 	if err != nil {
 		return err
 	}
+	entry := table.Entries[n]
 	table.Entries = append(table.Entries[:n], table.Entries[n+1:]...)
 
 	path := fmt.Sprintf("%s/%s.csv", database.Name, name)
@@ -101,6 +147,8 @@ func (database *DB) DelRow(name string, n int) error {
 	if err != nil {
 		return err
 	}
+
+	database.AddTransaction("DELROW", name, entry, n)
 
 	return nil
 }
@@ -139,6 +187,8 @@ func (database *DB) AddRow(name string, entry []string, n int) error {
 		return err
 	}
 
+	database.AddTransaction("ADDROW", name, entry, n)
+
 	return nil
 }
 
@@ -156,6 +206,9 @@ func (database *DB) MakeTable(name string, headers []string) error {
 		return err
 	}
 	database.Tables = append(database.Tables, name)
+
+	database.AddTransaction("MAKETABLE", name, headers)
+
 	return nil
 }
 
@@ -163,16 +216,23 @@ func (database *DB) MakeTable(name string, headers []string) error {
 func (database *DB) DelTable(name string) error {
 	//Strings package instead of a loop to try and keep it fast on large DB's
 	tables := strings.Join(database.Tables, " ")
+	t, err := database.ReadTable(name)
+	if err != nil {
+		return err
+	}
 	//Check if table exists
 	if !strings.Contains(tables, name) {
 		return errors.New(fmt.Sprintf("table %s does not exist", name))
 	}
 	tables = strings.Replace(tables, " "+name, "", 1)
 	database.Tables = strings.Split(tables, " ")
-	err := os.Remove(fmt.Sprintf("%s/%s.csv", database.Name, name))
+	err = os.Remove(fmt.Sprintf("%s/%s.csv", database.Name, name))
 	if err != nil {
 		return err
 	}
+
+	database.AddTransaction("DELROW", name, t.Headers, t.Entries)
+
 	return nil
 }
 
