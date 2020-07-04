@@ -1,9 +1,9 @@
-package storage
+package main
 
 import (
-	"ManticoreDB/misc"
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
 //Struct containing pointers to DB's
@@ -24,7 +24,7 @@ func (s Schema) DBNames() []string {
 func (s *Schema) Makedb(name string) error {
 	var temp DB
 	temp.Name = name
-	misc.MakeDir(name) //attempts to make the DB directory if it needs to
+	MakeDir(name) //attempts to make the DB directory if it needs to
 	//get the table names
 	files, err := ioutil.ReadDir(name)
 	if err != nil {
@@ -32,7 +32,9 @@ func (s *Schema) Makedb(name string) error {
 	}
 	if len(files) != 0 {
 		for i := 0; i < len(files); i++ {
-			temp.Tables = append(temp.Tables, files[i].Name())
+			if !strings.Contains(files[i].Name(), "tlog.gob") {
+				temp.Tables = append(temp.Tables, files[i].Name())
+			}
 		}
 	}
 	s.Databases = append(s.Databases, &temp)
